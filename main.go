@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"io/ioutil"
 )
 
 type instruction struct {
@@ -15,12 +16,13 @@ type instruction struct {
 	function string
 }
 
+var instructions = []instruction{}
+
 func read_instructions() {
 	csvFile, err := os.Open("8080.csv")
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("CSV File Opened")
 	// Close when finished
 	defer csvFile.Close()
 
@@ -29,7 +31,6 @@ func read_instructions() {
 		fmt.Println(err)
 	}
 
-	instructions := []instruction{}
 
 	for _, line := range csvLines {
 		opcode := line[0]
@@ -53,4 +54,16 @@ func disassemble_8080op(codebuffer []byte, pc int) (int64){
 
 func main() {
 	read_instructions()
+	invaders, err := ioutil.ReadFile("invaders.bin")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	for indx, num := range invaders {
+		invaders[indx] = (num % 48)
+	}
+	for program_counter, _ := range invaders {
+		size := disassemble_8080op(invaders, program_counter)
+		program_counter += (int(size)*2)
+	}
 }
