@@ -37,9 +37,9 @@ func read_instructions() {
 		mnemonic, flags, function := line[1], line[3], line[4]
 		instructions = append(instructions, instruction{opcode, mnemonic, size, flags, function})
 	}
-	for _, instruction := range instructions {
-		fmt.Println(instruction)
-	}
+	// Ignore CSV header, a bit hacky, but it'll do for now
+	instructions = instructions[1:]
+}
 
 // codebuffer should hold valid 8080 assembly code.
 // pc is the current offset into the code
