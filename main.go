@@ -40,7 +40,17 @@ func read_instructions() {
 	for _, instruction := range instructions {
 		fmt.Println(instruction)
 	}
+
+// codebuffer should hold valid 8080 assembly code.
+// pc is the current offset into the code
+// returns the number of bytes of the op
+func disassemble_8080op(codebuffer []byte, pc int) (int64){
+	var code byte = codebuffer[pc]
+	var instruction instruction =  instructions[code]
+	fmt.Printf("0x%x: %q | %q \n", pc, instruction.mnemonic, instruction.function)
+	return instruction.size
 }
+
 func main() {
 	read_instructions()
 }
