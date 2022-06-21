@@ -1,5 +1,5 @@
 Opcode,Instruction,size,flags,function
-0x00,NOP,1,,
+0x00,NOP,1,"","Do nothing"
 0x01,"LXI B,D16",3,,"B <- byte 3, C <- byte 2"
 0x02,STAX B,1,,(BC) <- A
 0x03,INX B,1,,BC <- BC+1
