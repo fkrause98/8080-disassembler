@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strconv"
+	"strings"
 )
 
 type instruction struct {
@@ -44,11 +45,46 @@ func read_instructions() {
 // codebuffer should hold valid 8080 assembly code.
 // pc is the current offset into the code
 // returns the number of bytes of the op
-func disassemble_8080op(codebuffer string, pc int) int64 {
+func disassemble_8080op(codebuffer string, pc int) (size int64) {
 	var code string = codebuffer[pc : pc+2]
 	var instruction instruction = instructions[code]
-	fmt.Printf("0x%X: %q | %q \n", pc, instruction.mnemonic, instruction.function)
-	return instruction.size
+	var disassembly string
+	size = instruction.size
+	if size > 1 {
+		var arguments string = codebuffer[pc+2 : int64(pc)+(instruction.size*2)]
+		disassembly = replace_arguments(instruction.mnemonic, arguments)
+		fmt.Printf("0x%X: %s \n", pc, disassembly)
+		return
+	} else {
+		disassembly = fmt.Sprintf("0x%X: %s \n", pc, instruction.mnemonic)
+		fmt.Printf(disassembly)
+		return
+	}
+}
+
+func replace_arguments(mnemonic string, arguments string) string {
+	var has_word_argument bool = strings.Contains(mnemonic, "D16")
+	var has_address_argument bool = strings.Contains(mnemonic, "adr")
+	var has_byte_argument bool = strings.Contains(mnemonic, "D8")
+	// Remember that Intel is little endian
+	if has_word_argument {
+		return strings.Replace(mnemonic, "D16", string([]byte{arguments[2], arguments[3], arguments[0], arguments[1]}[:]), -1)
+	}
+	if has_address_argument {
+		return strings.Replace(mnemonic, "adr", string([]byte{arguments[2], arguments[3], arguments[0], arguments[1]}[:]), -1)
+	}
+	if has_byte_argument {
+		return strings.Replace(mnemonic, "D8", string([]byte{arguments[0], arguments[1]}[:]), -1)
+	}
+	return "ERROR REPLACING"
+}
+func reverse(in string) string {
+	var sb strings.Builder
+	runes := []rune(in)
+	for i := len(runes) - 1; 0 <= i; i-- {
+		sb.WriteRune(runes[i])
+	}
+	return sb.String()
 }
 
 // Takes the invader.bin file
