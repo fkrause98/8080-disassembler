@@ -38,8 +38,6 @@ func read_instructions() {
 		mnemonic, flags, function := line[1], line[3], line[4]
 		instructions[opcode[2:]] = instruction{opcode, mnemonic, size, flags, function}
 	}
-	// Ignore CSV header, a bit hacky, but it'll do for now
-	// instructions = instructions[1:]
 }
 
 // codebuffer should hold valid 8080 assembly code.
@@ -62,6 +60,12 @@ func disassemble_8080op(codebuffer string, pc int) (size int64) {
 	}
 }
 
+// Takes D16 and D8 or an adr from the given mnemonic and
+// replaces it with an argument. Eg:
+// If I have:
+// JMP adr
+// This will turn into
+// JMP 18d4
 func replace_arguments(mnemonic string, arguments string) string {
 	var has_word_argument bool = strings.Contains(mnemonic, "D16")
 	var has_address_argument bool = strings.Contains(mnemonic, "adr")
@@ -78,15 +82,6 @@ func replace_arguments(mnemonic string, arguments string) string {
 	}
 	return "ERROR REPLACING"
 }
-func reverse(in string) string {
-	var sb strings.Builder
-	runes := []rune(in)
-	for i := len(runes) - 1; 0 <= i; i-- {
-		sb.WriteRune(runes[i])
-	}
-	return sb.String()
-}
-
 // Takes the invader.bin file
 // and turns it into a string
 func read_rom(path string) string {
