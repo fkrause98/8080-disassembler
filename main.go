@@ -72,13 +72,13 @@ func replace_arguments(mnemonic string, arguments string) string {
 	var has_byte_argument bool = strings.Contains(mnemonic, "D8")
 	// Remember that Intel is little endian
 	if has_word_argument {
-		return strings.Replace(mnemonic, "D16", string([]byte{arguments[2], arguments[3], arguments[0], arguments[1]}[:]), -1)
+		return strings.Replace(mnemonic, "D16", "0x" + string([]byte{arguments[2], arguments[3], arguments[0], arguments[1]}[:]), -1)
 	}
 	if has_address_argument {
-		return strings.Replace(mnemonic, "adr", string([]byte{arguments[2], arguments[3], arguments[0], arguments[1]}[:]), -1)
+		return strings.Replace(mnemonic, "adr", "0x" + string([]byte{arguments[2], arguments[3], arguments[0], arguments[1]}[:]), -1)
 	}
 	if has_byte_argument {
-		return strings.Replace(mnemonic, "D8", string([]byte{arguments[0], arguments[1]}[:]), -1)
+		return strings.Replace(mnemonic, "D8", "0x" + string([]byte{arguments[0], arguments[1]}[:]), -1)
 	}
 	return "ERROR REPLACING"
 }
